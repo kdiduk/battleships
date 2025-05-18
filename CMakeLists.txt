@@ -14,8 +14,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Create your game executable target as usual
-add_executable(battleships WIN32 src/main.cxx)
+# Create game executable target
+add_executable(
+    battleships
+    WIN32
+    src/main.cxx
+    src/main_scene.cxx
+    src/scenes.cxx
+)
 
 # Link to the actual SDL3 library.
 target_link_libraries(battleships PRIVATE SDL3::SDL3)

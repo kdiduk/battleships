@@ -19,11 +19,13 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#include "main_scene.hxx"
+#include "scenes.hxx"
+
 
 static SDL_Window *window = NULL;
 static SDL_Renderer *renderer = NULL;
 static const std::string game_title = "Battleships";
-static const auto text_scale = 4.0f;
 
 
 SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
@@ -46,17 +48,20 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
+    scenes::set_current_scene(main_scene::create_main_scene());
+
     return SDL_APP_CONTINUE;
 }
 
 
 SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 {
-    switch (event->type) {
-        case SDL_EVENT_KEY_DOWN:
-        case SDL_EVENT_QUIT:
-            return SDL_APP_SUCCESS;
+    if (event->type == SDL_EVENT_QUIT)
+    {
+        return SDL_APP_SUCCESS;
     }
+    
+    scenes::get_current_scene()->on_event(event);
 
     return SDL_APP_CONTINUE;
 }
@@ -64,19 +69,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-    /* Center the message and scale it up */
-    int w = 0, h = 0;
-    SDL_GetRenderOutputSize(renderer, &w, &h);
-    SDL_SetRenderScale(renderer, text_scale, text_scale);
-
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
-    const auto x = ((w / text_scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE * game_title.length()) / 2;
-    const auto y = ((h / text_scale) - SDL_DEBUG_TEXT_FONT_CHARACTER_SIZE) / 2;
-    SDL_RenderDebugText(renderer, x, y, game_title.c_str());
-    SDL_RenderPresent(renderer);
+    scenes::get_current_scene()->on_render(renderer);
 
     return SDL_APP_CONTINUE;
 }
