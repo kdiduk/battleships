@@ -19,11 +19,17 @@ namespace scenes
 {
     static std::shared_ptr<scene> current_scene = nullptr;
 
+    void scene::on_init()
+    {
+        if (on_init_callback)
+            on_init_callback();
+    }
 
-    void scene::on_render(SDL_Renderer* renderer)
+
+    void scene::on_render()
     {
         if (on_render_callback)
-            on_render_callback(renderer);
+            on_render_callback();
     }
 
 
@@ -34,7 +40,13 @@ namespace scenes
     }
 
 
-    void scene::builder::set_on_render_callback(std::function<void(SDL_Renderer*)> callback)
+    void scene::builder::set_on_init_callback(std::function<void()> callback)
+    {
+        on_init_callback = callback;
+    }
+
+    
+    void scene::builder::set_on_render_callback(std::function<void()> callback)
     {
         on_render_callback = callback;
     }
@@ -49,8 +61,11 @@ namespace scenes
     std::shared_ptr<scene> scene::builder::build()
     {
         auto new_scene = std::make_shared<scene>();
+        
+        new_scene->on_init_callback = on_init_callback;
         new_scene->on_render_callback = on_render_callback;
         new_scene->on_event_callback = on_event_callback;
+        
         return new_scene;
     }
 
@@ -58,6 +73,8 @@ namespace scenes
     void set_current_scene(std::shared_ptr<scene> scene)
     {
         current_scene = scene;
+        if (scene)
+            scene->on_init();
     }
 
     

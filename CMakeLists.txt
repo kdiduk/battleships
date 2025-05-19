@@ -6,8 +6,16 @@ project(battleships)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/$<CONFIGURATION>")
 
-# This assumes the SDL source is available in vendored/SDL
 add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
+
+set(SDLIMAGE_VENDORED ON)
+set(SDLIMAGE_AVIF OFF)	# disable formats we don't use to make the build faster and smaller.
+set(SDLIMAGE_BMP OFF)
+set(SDLIMAGE_JPEG OFF)
+set(SDLIMAGE_TIF OFF)
+set(SDLIMAGE_WEBP OFF)
+add_subdirectory(vendored/SDL_image EXCLUDE_FROM_ALL)
+
 
 # Use C++17 standard
 set(CMAKE_CXX_STANDARD 17)
@@ -18,10 +26,23 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_executable(
     battleships
     WIN32
+    src/game.cxx
     src/main.cxx
     src/main_scene.cxx
     src/scenes.cxx
+    src/texture.cxx
 )
 
 # Link to the actual SDL3 library.
-target_link_libraries(battleships PRIVATE SDL3::SDL3)
+target_link_libraries(battleships PUBLIC SDL3_image::SDL3_image SDL3::SDL3)
+
+# Copy assets to the build directory
+add_custom_command(
+    TARGET battleships
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/assets
+        ${CMAKE_BINARY_DIR}/$<CONFIGURATION>/assets
+)
+
+# EOF

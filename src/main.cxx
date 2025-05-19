@@ -19,6 +19,7 @@
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
+#include "game.hxx"
 #include "main_scene.hxx"
 #include "scenes.hxx"
 
@@ -48,6 +49,8 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
         return SDL_APP_FAILURE;
     }
 
+    battleships::game::init(window, renderer);
+
     scenes::set_current_scene(main_scene::create_main_scene());
 
     return SDL_APP_CONTINUE;
@@ -69,7 +72,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
-    scenes::get_current_scene()->on_render(renderer);
+    scenes::get_current_scene()->on_render();
 
     return SDL_APP_CONTINUE;
 }

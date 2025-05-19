@@ -32,12 +32,15 @@ namespace scenes
 
         virtual ~scene() = default;
 
-        void on_render(SDL_Renderer* renderer);
+        void on_init();
+
+        void on_render();
 
         void on_event(SDL_Event* event);
 
     private:
-        std::function<void(SDL_Renderer*)> on_render_callback;
+        std::function<void()> on_init_callback;
+        std::function<void()> on_render_callback;
         std::function<void(SDL_Event*)> on_event_callback;
     }; // class scene
 
@@ -46,14 +49,17 @@ namespace scenes
     {
     public:
 
-        void set_on_render_callback(std::function<void(SDL_Renderer*)> callback);
+        void set_on_init_callback(std::function<void()> callback);
+        
+        void set_on_render_callback(std::function<void()> callback);
 
         void set_on_event_callback(std::function<void(SDL_Event*)> callback);
 
         std::shared_ptr<scene> build();
 
     private:
-        std::function<void(SDL_Renderer*)> on_render_callback;
+        std::function<void()> on_init_callback;
+        std::function<void()> on_render_callback;
         std::function<void(SDL_Event*)> on_event_callback;
     }; // class scene_builder
 
